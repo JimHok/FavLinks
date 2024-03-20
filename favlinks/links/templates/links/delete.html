@@ -1,0 +1,26 @@
+{% extends 'links/form_main.html'%} {%load static%} {% block styles %}
+.form-container { max-width: 500px; padding: 30px; background-color: #fff;
+border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); } {% endblock %}
+{% block content %}
+<div class="form-container">
+  <h2 class="text-center mb-4">Delete Confirmation</h2>
+  <p class="text-center">Are you sure you want to delete "{{ item }}"?</p>
+  <form action="" method="POST">
+    {% csrf_token %} {% for field in form %} {% if not field.is_hidden %}
+    <div class="form-group">
+      {{ field.label_tag }} {{ field }} {% if field.errors %}
+      <div class="text-danger">{{ field.errors }}</div>
+      {% endif %}
+    </div>
+    {% endif %} {% endfor %}
+    <div class="text-center">
+      <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-secondary"
+        >Cancel</a
+      >
+      <button type="submit" name="Confirm" class="btn btn-danger">
+        Confirm
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

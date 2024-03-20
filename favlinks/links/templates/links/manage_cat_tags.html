@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Manage Categories and Tags</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <style>
+      body {
+        background-color: #e8e8e8;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin-left: 5vw;
+        margin-right: 5vw;
+      }
+    </style>
+    <script
+      src="https://kit.fontawesome.com/yourcode.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <br />
+    {% include 'links/navbar.html' %}
+    <br />
+    <div class="card card-body">
+      <div class="input-group rounded">
+        <input
+          type="search"
+          class="form-control rounded"
+          placeholder="Search"
+          aria-label="Search"
+          aria-describedby="search-addon"
+        />
+        <span class="input-group-text border-0" id="search-addon">
+          <i class="fa fa-search"></i>
+        </span>
+      </div>
+    </div>
+    <br />
+    <div class="row">
+      <div class="col-md">
+        <div class="card card-body">
+          <div class="row">
+            <div class="col-md">
+              <a
+                class="btn btn-primary btn-sm btn-block"
+                href="{% url 'links:add_cat' %}"
+                >Add Category</a
+              >
+            </div>
+          </div>
+          <br />
+          <table class="table table-sm">
+            <tr style="text-align: center; vertical-align: middle">
+              <th style="text-align: center; vertical-align: middle">
+                Category
+              </th>
+              <th style="text-align: center; vertical-align: middle">
+                Associate URL
+              </th>
+              <th style="text-align: center; vertical-align: middle">
+                Update Category
+              </th>
+              <th style="text-align: center; vertical-align: middle">
+                Delete Category
+              </th>
+            </tr>
+            {% for cat in categories %}
+            <tr>
+              <td style="text-align: center; vertical-align: middle">
+                {{cat.name}}
+              </td>
+              <td style="text-align: center; vertical-align: middle">
+                {{ cat.num_links }}
+              </td>
+              <td style="text-align: center; vertical-align: middle">
+                <a
+                  class="btn btn-warning btn-sm"
+                  href="{% url 'links:update_cat' cat.id %}"
+                  >Update</a
+                >
+              </td>
+              <td style="text-align: center; vertical-align: middle">
+                <a
+                  class="btn btn-danger btn-sm"
+                  href="{% url 'links:delete_cat' cat.id %}"
+                  >Delete</a
+                >
+              </td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+
+      <div class="col-md">
+        <div class="card card-body">
+          <div class="row">
+            <div class="col-md">
+              <a
+                class="btn btn-primary btn-sm btn-block"
+                href="{% url 'links:add_tag' %}"
+                >Add Tag</a
+              >
+            </div>
+          </div>
+          <br />
+          <table class="table table-sm">
+            <tr style="text-align: center; vertical-align: middle">
+              <th style="text-align: center; vertical-align: middle">Tag</th>
+              <th style="text-align: center; vertical-align: middle">
+                Associate URL
+              </th>
+              <th style="text-align: center; vertical-align: middle">
+                Update Tag
+              </th>
+              <th style="text-align: center; vertical-align: middle">
+                Delete Tag
+              </th>
+            </tr>
+            {% for tag in tags %}
+            <tr>
+              <td style="text-align: center; vertical-align: middle">
+                {{tag.name}}
+              </td>
+              <td style="text-align: center; vertical-align: middle">
+                {{ tag.num_links }}
+              </td>
+              <td style="text-align: center; vertical-align: middle">
+                <a
+                  class="btn btn-warning btn-sm"
+                  href="{% url 'links:update_tag' tag.id %}"
+                  >Update</a
+                >
+              </td>
+              <td style="text-align: center; vertical-align: middle">
+                <a
+                  class="btn btn-danger btn-sm"
+                  href="{% url 'links:delete_tag' tag.id %}"
+                  >Delete</a
+                >
+              </td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

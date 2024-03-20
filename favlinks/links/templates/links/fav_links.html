@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Fav Links</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+
+    <style>
+      body {
+        background-color: #e8e8e8;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin-left: 5vw;
+        margin-right: 5vw;
+      }
+    </style>
+    <script
+      src="https://kit.fontawesome.com/yourcode.js"
+      crossorigin="anonymous"
+    ></script>
+    {% if messages %}
+    <script>
+      window.onload = function() {
+        {% for message in messages %}
+          alert("{{ message }}");
+        {% endfor %}
+      };
+    </script>
+    {% endif %}
+  </head>
+  <body>
+    <br />
+    {% include 'links/navbar.html' %}
+    <br />
+    <div class="card card-body">
+      <form action="" method="GET">
+        <div class="row-md">
+          {% for field in myFilter.form %}
+          <label for="{{ field.id_for_label }}">{{ field.label }}: </label>
+          {{ field }} {% endfor %}
+          <button class="btn btn-primary" type="submit">
+            <i class="fa fa-search"></i> Search
+          </button>
+        </div>
+      </form>
+    </div>
+    <br />
+    <div class="row">
+      <div class="col-md">
+        <div class="card card-body">
+          <div class="row">
+            <div class="col-md">
+              <a
+                class="btn btn-primary btn-sm btn-block"
+                href="{% url 'links:add_link' %}"
+                >Add Link</a
+              >
+            </div>
+            <div class="col-md">
+              <a
+                class="btn btn-primary btn-sm btn-block"
+                href="{% url 'links:manage_cat_tags' %}"
+                >Manage Categorys and Tags</a
+              >
+            </div>
+          </div>
+          <br />
+          <table class="table table-sm">
+            <tr style="text-align: center; vertical-align: middle">
+              <th style="text-align: center; vertical-align: middle">Title</th>
+              <th style="text-align: center; vertical-align: middle">URL</th>
+              <th style="text-align: center; vertical-align: middle">
+                Category
+              </th>
+              <th style="text-align: center; vertical-align: middle">Tags</th>
+              <th style="text-align: center; vertical-align: middle">Status</th>
+              <th style="text-align: center; vertical-align: middle">
+                Date Added
+              </th>
+              <th style="text-align: center; vertical-align: middle">
+                Update URL
+              </th>
+              <th style="text-align: center; vertical-align: middle">
+                Delete URL
+              </th>
+            </tr>
+            {% for link in page_obj %}
+            <tr>
+              <td style="text-align: center; vertical-align: middle">
+                {{ link.title }}
+              </td>
+              <td style="text-align: center; vertical-align: middle">
+                <a href="{{ link.url }}" target="_blank">{{ link.url }}</a>
+              </td>
+              <td style="text-align: center; vertical-align: middle">
+                {{ link.category }}
+              </td>
+              <td style="text-align: center; vertical-align: middle">
+                {% for tag in link.tags.all %}
+                <span class="badge badge-primary badge-pill"
+                  >{{ tag.name }}</span
+                >
+                {% endfor %}
+              </td>
+              <td style="text-align: center; vertical-align: middle">
+                {% if link.status %}
+                <i class="fa fa-check-circle text-success"></i>
+                {% else %}
+                <i class="fa fa-times-circle text-danger"></i>
+                {% endif %}
+              </td>
+
+              <td style="text-align: center; vertical-align: middle">
+                {{ link.date }}
+              </td>
+
+              <td style="text-align: center; vertical-align: middle">
+                <a
+                  class="btn btn-warning btn-sm"
+                  href="{% url 'links:update_link' link.id %}"
+                  >Update</a
+                >
+              </td>
+              <td style="text-align: center; vertical-align: middle">
+                <a
+                  class="btn btn-danger btn-sm"
+                  href="{% url 'links:delete_link' link.id %}"
+                  >Delete</a
+                >
+              </td>
+            </tr>
+            {% endfor %}
+          </table>
+          <div class="pagination justify-content-center mt-4">
+            <ul class="pagination">
+              {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page=1">&laquo; first</a>
+              </li>
+              <li class="page-item">
+                <a
+                  class="page-link"
+                  href="?page={{ page_obj.previous_page_number }}"
+                  >previous</a
+                >
+              </li>
+              {% endif %}
+
+              <li class="page-item disabled">
+                <span class="page-link"
+                  >Page {{ page_obj.number }} of
+                  {{page_obj.paginator.num_pages}}
+                </span>
+              </li>
+
+              {% if page_obj.has_next %}
+              <li class="page-item">
+                <a
+                  class="page-link"
+                  href="?page={{ page_obj.next_page_number }}"
+                  >next</a
+                >
+              </li>
+              <li class="page-item">
+                <a
+                  class="page-link"
+                  href="?page={{ page_obj.paginator.num_pages }}"
+                  >last &raquo;</a
+                >
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

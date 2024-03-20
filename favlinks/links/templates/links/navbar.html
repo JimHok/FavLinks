@@ -1,0 +1,36 @@
+{% load static %}
+
+<style>
+  .hello-msg {
+    margin-right: 10px;
+    font-size: 18px;
+    color: white;
+  }
+</style>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="{% url 'links:home' %}">Favorite Links</a>
+  <button
+    class="navbar-toggler"
+    type="button"
+    data-toggle="collapse"
+    data-target="#navbarNav"
+    aria-controls="navbarNav"
+    aria-expanded="false"
+    aria-label="Toggle navigation"
+  >
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'links:manage_cat_tags' %}"
+          >Manage Categories and Tags</a
+        >
+      </li>
+    </ul>
+  </div>
+
+  <span class="hello-msg">Hello, {{request.user}}</span>
+  <a class="hello-msg" href="{% url 'links:logout' %}">Logout</a>
+</nav>
