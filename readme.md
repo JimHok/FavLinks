@@ -73,12 +73,20 @@ You should now be able to access the development server at http://127.0.0.1:8000
 
 ### 2. Run Celery for peroidic tasks
 
-A new terminal need to be opened with venv
+- A new terminal need to be opened with venv
 
 ```bash
 source .venv/Scripts/activate
 cd favlinks
 ```
+
+- For Unix/macOS
+
+```bash
+celery -A favlinks worker -l info
+```
+
+- For Windows
 
 ```bash
 celery -A favlinks worker -l info -P gevent
@@ -86,7 +94,7 @@ celery -A favlinks worker -l info -P gevent
 
 ### 3. Run Celery beat for peroidic tasks
 
-A new terminal need to be opened with venv
+- A new terminal need to be opened with venv
 
 ```bash
 source .venv/Scripts/activate
