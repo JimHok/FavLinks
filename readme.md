@@ -14,7 +14,7 @@ Welcome to our Django project (Favorite Links)! This guide will help you get sta
 ### 1. Clone the repository (if you haven't already)
 
 ```bash
-git clone <repository_url>
+git clone https://github.com/JimHok/FavLinks.git
 ```
 
 ### 2. For Unix/macOS
