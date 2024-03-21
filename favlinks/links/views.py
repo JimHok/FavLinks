@@ -9,13 +9,17 @@ from django.core.paginator import Paginator
 from django_celery_beat.models import IntervalSchedule, PeriodicTask
 
 import requests
+import threading
 from bs4 import BeautifulSoup
+import json
 
 from .models import *
 from .forms import CreateUserForm, FavoriteLinkForm, CategoryForm, TagForm
 from .filters import FavLinkFilter
 from .decorators import unauthenticated_user
 from .tasks import get_links
+
+url_lock = threading.Lock()
 
 
 @unauthenticated_user
@@ -54,17 +58,20 @@ def logoutUser(request):
 
 @login_required(login_url="links:login")
 def home(request):
-    get_links.delay()
-    fav_links = FavLink.objects.filter(user=request.user).order_by("-date")
 
-    myFilter = FavLinkFilter(request.user, request.GET, queryset=fav_links)
-    fav_links = myFilter.qs
+    with url_lock:
+        fav_links = FavLink.objects.filter(user=request.user).order_by("-date")
 
-    paginator = Paginator(fav_links, 5)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
+        get_links.delay()
 
-    context = {"myFilter": myFilter, "page_obj": page_obj}
+        myFilter = FavLinkFilter(request.user, request.GET, queryset=fav_links)
+        fav_links = myFilter.qs
+
+        paginator = Paginator(fav_links, 5)
+        page_number = request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+
+        context = {"myFilter": myFilter, "page_obj": page_obj}
     return render(request, "links/fav_links.html", context)
 
 
@@ -210,14 +217,13 @@ def deleteTag(request, pk):
 @login_required(login_url="links:login")
 def scheduleTask(request):
     interval, _ = IntervalSchedule.objects.get_or_create(
-        every=30, period=IntervalSchedule.SECONDS
+        every=10, period=IntervalSchedule.SECONDS
     )
 
     PeriodicTask.objects.create(
         interval=interval,
         name="get-link",
         task="links.tasks.get_links",
-        # args=json.dumps([request.user.id]),
     )
 
     return HttpResponse("Task scheduled!")

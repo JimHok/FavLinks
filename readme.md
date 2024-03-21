@@ -95,6 +95,7 @@ celery -A favlinks worker -l info -P gevent
 ### 3. Run Celery beat for peroidic tasks
 
 - A new terminal need to be opened with venv
+- Wait for celery to start first
 
 ```bash
 source .venv/Scripts/activate

@@ -1,13 +1,19 @@
 from celery import shared_task
-from celery.utils.log import get_task_logger
-from time import sleep
-
-logger = get_task_logger(__name__)
+from .models import *
+import requests
 
 
-@shared_task
+@shared_task()
 def get_links():
-    for i in range(11):
-        logger.info(i)
-        sleep(1)
+
+    fav_links = FavLink.objects.all()
+    links = [link for link in fav_links]
+
+    for link in links:
+        response = requests.get(link.url)
+        print(link.url)
+        link.status = response.status_code == 200
+        print(link.status)
+        link.save()
+
     return "Task completed!"
