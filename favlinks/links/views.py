@@ -110,7 +110,9 @@ def addLink(request):
 @login_required(login_url="links:login")
 def updateLink(request, pk):
     if not cache.get("links_updated"):
-        messages.error(request, "Links update in progress please wait a monment...")
+        messages.error(
+            request, "URLs validity checking in progress, please wait a moment..."
+        )
         return redirect("/")
     fav_link = FavLink.objects.get(id=pk)
     form = FavoriteLinkForm(request.user, instance=fav_link)
@@ -140,7 +142,9 @@ def updateLink(request, pk):
 @login_required(login_url="links:login")
 def deleteLink(request, pk):
     if not cache.get("links_updated"):
-        messages.error(request, "Links update in progress please wait a monment...")
+        messages.error(
+            request, "URLs validity checking in progress, please wait a moment..."
+        )
         return redirect("/")
     fav_link = FavLink.objects.get(id=pk)
     if request.method == "POST":

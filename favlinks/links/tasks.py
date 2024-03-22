@@ -7,17 +7,14 @@ from django.core.cache import cache
 @shared_task()
 def get_links():
     cache.set("links_updated", False, timeout=None)
-    print("cache: " + str(cache.get("links_updated")))
     fav_links = FavLink.objects.all()
     links = [link for link in fav_links]
 
     for link in links:
         response = requests.get(link.url)
-        print(link.url)
         link.status = response.status_code == 200
-        print(link.status)
+        print(f"URL: {str(link.url)}\n Status: {str(link.status)}")
         link.save()
 
     cache.set("links_updated", True, timeout=None)
-    print("cache: " + str(cache.get("links_updated")))
     return "Task completed!"
