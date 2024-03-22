@@ -7,6 +7,7 @@ from django.db.models import Count
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django_celery_beat.models import IntervalSchedule, PeriodicTask
+from django.core.cache import cache
 
 import requests
 import threading
@@ -18,8 +19,6 @@ from .forms import CreateUserForm, FavoriteLinkForm, CategoryForm, TagForm
 from .filters import FavLinkFilter
 from .decorators import unauthenticated_user
 from .tasks import get_links
-
-url_lock = threading.Lock()
 
 
 @unauthenticated_user
@@ -59,19 +58,16 @@ def logoutUser(request):
 @login_required(login_url="links:login")
 def home(request):
 
-    with url_lock:
-        fav_links = FavLink.objects.filter(user=request.user).order_by("-date")
+    fav_links = FavLink.objects.filter(user=request.user).order_by("-date")
 
-        get_links.delay()
+    myFilter = FavLinkFilter(request.user, request.GET, queryset=fav_links)
+    fav_links = myFilter.qs
 
-        myFilter = FavLinkFilter(request.user, request.GET, queryset=fav_links)
-        fav_links = myFilter.qs
+    paginator = Paginator(fav_links, 5)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
-        paginator = Paginator(fav_links, 5)
-        page_number = request.GET.get("page")
-        page_obj = paginator.get_page(page_number)
-
-        context = {"myFilter": myFilter, "page_obj": page_obj}
+    context = {"myFilter": myFilter, "page_obj": page_obj}
     return render(request, "links/fav_links.html", context)
 
 
@@ -113,6 +109,9 @@ def addLink(request):
 
 @login_required(login_url="links:login")
 def updateLink(request, pk):
+    if not cache.get("links_updated"):
+        messages.error(request, "Links update in progress please wait a monment...")
+        return redirect("/")
     fav_link = FavLink.objects.get(id=pk)
     form = FavoriteLinkForm(request.user, instance=fav_link)
     if request.method == "POST":
@@ -140,6 +139,9 @@ def updateLink(request, pk):
 
 @login_required(login_url="links:login")
 def deleteLink(request, pk):
+    if not cache.get("links_updated"):
+        messages.error(request, "Links update in progress please wait a monment...")
+        return redirect("/")
     fav_link = FavLink.objects.get(id=pk)
     if request.method == "POST":
         fav_link.delete()
@@ -212,6 +214,12 @@ def updateTag(request, pk):
 @login_required(login_url="links:login")
 def deleteTag(request, pk):
     return handle_generic_delete(request, Tag, "manage_cat_tags", pk)
+
+
+@login_required(login_url="links:login")
+def urlCheck(request):
+    get_links.delay()
+    return redirect("/")
 
 
 @login_required(login_url="links:login")

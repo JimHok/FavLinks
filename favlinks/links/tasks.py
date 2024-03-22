@@ -1,11 +1,13 @@
 from celery import shared_task
 from .models import *
 import requests
+from django.core.cache import cache
 
 
 @shared_task()
 def get_links():
-
+    cache.set("links_updated", False, timeout=None)
+    print("cache: " + str(cache.get("links_updated")))
     fav_links = FavLink.objects.all()
     links = [link for link in fav_links]
 
@@ -16,4 +18,6 @@ def get_links():
         print(link.status)
         link.save()
 
+    cache.set("links_updated", True, timeout=None)
+    print("cache: " + str(cache.get("links_updated")))
     return "Task completed!"
