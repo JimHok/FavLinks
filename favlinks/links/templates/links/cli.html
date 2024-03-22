@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>CLI | Command Line Interface</title>
+    <meta name="title" content="CLI | jQuery Command Line Interface" />
+    <meta
+      name="description"
+      content="Simulating a command line interface to display info using jQuery"
+    />
+    {% load static %}
+    <link href="{% static 'links/style.css' %}" rel="stylesheet" />
+  </head>
+  <body>
+    <main>
+      <section id="home">
+        <h2>CLI - Command Line Interface for FavLinks</h2>
+        <p>A command line interface for managing your favorite links.</p>
+        <p>
+          <span>Type 'help' + <kbd>Enter</kbd> -- for available commands.</span>
+        </p>
+      </section>
+      <section id="list_links">
+        <h2><span>&raquo;List Links</span></h2>
+        <p>Here is the list of your favorite links:</p>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>URL</th>
+              <th>Category</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for link in fav_links %}
+            <tr>
+              <td>{{ link.pk }}</td>
+              <td>{{ link.title }}</td>
+              <td>{{ link.url }}</td>
+              <td>{{ link.category }}</td>
+              <td>{{ link.status }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+
+      <section id="list_category">
+        <h2><span>&raquo;List Category</span></h2>
+        <p>Here is the list of your category:</p>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cat in categories %}
+            <tr>
+              <td>{{ cat.pk }}</td>
+              <td>{{ cat.name }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+
+      <section id="add">
+        <h2><span>&raquo;Add Link</span></h2>
+        <p>Adding a new link to your favorite list...</p>
+        {% if error %}
+        <p>Invalid URL please try again.</p>
+        {% else %}
+        <p>Link added to your favorite list.</p>
+        {% endif %}
+      </section>
+
+      <section id="update">
+        <h2><span>&raquo;Edit Link</span></h2>
+        <p>Edit a favorite link...</p>
+      </section>
+
+      <section id="delete">
+        <h2><span>&raquo;Remove Link</span></h2>
+        <p>Removing a favorite link...</p>
+      </section>
+
+      <section id="error">
+        <p>Command not found!</p>
+        <p>
+          <span>Type 'help' + <kbd>Enter</kbd> -- for available commands.</span>
+        </p>
+      </section>
+
+      <section id="help">
+        <h2><span>&raquo;Help?</span></h2>
+        <p>
+          <span>Type [command] + <kbd>Enter</kbd></span>
+        </p>
+        <ul>
+          <li>'home' -- Home page for the CLI</li>
+          <li>'list_links' -- List your favorite links ex: 'list_links'</li>
+          <li>'list_category' -- List your category ex: 'list_category'</li>
+          <li>
+            'add' -- Adding a new link to the favorite list ex: 'add &lt;url&gt;
+            &lt;category_id or name&gt;'
+          </li>
+          <li>
+            'update' -- Update a favorite link ex: 'update &lt;url_id&gt;
+            &lt;url&gt; &lt;category_id or name&gt;'
+          </li>
+          <li>
+            'remove' -- Remove a favorite link ex: 'remove &lt;url_id&gt;'
+          </li>
+          <li>'search' -- Search for a favorite link</li>
+          <li>'filter' -- Filter your favorite links</li>
+          <li>'help' -- displays this list</li>
+        </ul>
+      </section>
+
+      <span class="command">favlinks:/$<input type="text" /></span>
+    </main>
+
+    <script src="{% static 'links/script.js' %}"></script>
+  </body>
+</html>

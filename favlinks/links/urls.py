@@ -19,4 +19,5 @@ urlpatterns = [
     path("delete_link/<str:pk>/", views.deleteLink, name="delete_link"),
     path("delete_cat/<str:pk>/", views.deleteCategory, name="delete_cat"),
     path("delete_tag/<str:pk>/", views.deleteTag, name="delete_tag"),
+    path("cli/", views.commandLineInterface, name="cli"),
 ]

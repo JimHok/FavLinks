@@ -50,6 +50,7 @@ def loginPage(request):
     return render(request, "links/login.html", context)
 
 
+@login_required(login_url="links:login")
 def logoutUser(request):
     logout(request)
     return redirect(reverse("links:login"))
@@ -82,23 +83,35 @@ def manageCatTags(request):
 
 
 @login_required(login_url="links:login")
-def addLink(request):
-    form = FavoriteLinkForm(request.user)
+def handle_generic_link_form(request, pk=None, category=None):
+    instance = None
+    if pk:
+        instance = FavLink.objects.get(id=pk)
+        if not cache.get("links_updated"):
+            messages.error(
+                request, "URLs validity checking in progress, please wait a moment..."
+            )
+            return redirect("/")
+    form = FavoriteLinkForm(request.user, instance=instance)
     if request.method == "POST":
         try:
             response = requests.get(request.POST.get("url"))
             soup = BeautifulSoup(response.text, "html.parser")
             title = soup.title.string
             mutable_post = request.POST.copy()
-            if request.POST.get("title") == "":
+            if request.POST.get("title") == "" or request.POST.get("title") is None:
                 mutable_post["title"] = title
             mutable_post["status"] = response.status_code == 200
-            form = FavoriteLinkForm(request.user, mutable_post)
+            if category:
+                mutable_post["category"] = category
+            form = FavoriteLinkForm(request.user, mutable_post, instance=instance)
             if form.is_valid():
                 favorite_link = form.save(commit=False)
                 favorite_link.user = request.user
                 form.save()
-                messages.success(request, "Link added successfully!")
+                messages.success(
+                    request, f"Link {'updated' if pk else 'added'} successfully!"
+                )
                 return redirect("/")
         except:
             messages.error(request, "Invalid URL")
@@ -108,35 +121,13 @@ def addLink(request):
 
 
 @login_required(login_url="links:login")
-def updateLink(request, pk):
-    if not cache.get("links_updated"):
-        messages.error(
-            request, "URLs validity checking in progress, please wait a moment..."
-        )
-        return redirect("/")
-    fav_link = FavLink.objects.get(id=pk)
-    form = FavoriteLinkForm(request.user, instance=fav_link)
-    if request.method == "POST":
-        try:
-            response = requests.get(request.POST.get("url"))
-            soup = BeautifulSoup(response.text, "html.parser")
-            title = soup.title.string
-            mutable_post = request.POST.copy()
-            if request.POST.get("title") == "":
-                mutable_post["title"] = title
-            mutable_post["status"] = response.status_code == 200
-            form = FavoriteLinkForm(request.user, mutable_post, instance=fav_link)
-            if form.is_valid():
-                favorite_link = form.save(commit=False)
-                favorite_link.user = request.user
-                form.save()
-                messages.success(request, "Link updated successfully!")
-                return redirect("/")
-        except:
-            messages.error(request, "Invalid URL")
+def addLink(request, category=None):
+    return handle_generic_link_form(request, category=category)
 
-    context = {"form": form, "title": "Link Form"}
-    return render(request, "links/link_form.html", context)
+
+@login_required(login_url="links:login")
+def updateLink(request, pk, category=None):
+    return handle_generic_link_form(request, pk=pk, category=category)
 
 
 @login_required(login_url="links:login")
@@ -226,8 +217,9 @@ def urlCheck(request):
     return redirect("/")
 
 
-@login_required(login_url="links:login")
+# @login_required(login_url="links:login")
 def scheduleTask(request):
+
     interval, _ = IntervalSchedule.objects.get_or_create(
         every=10, period=IntervalSchedule.SECONDS
     )
@@ -239,3 +231,35 @@ def scheduleTask(request):
     )
 
     return HttpResponse("Task scheduled!")
+
+
+@login_required(login_url="links:login")
+def commandLineInterface(request):
+    form = FavoriteLinkForm(request.user)
+    fav_links = FavLink.objects.filter(user=request.user).order_by("-date")
+    categories = Category.objects.filter(user=request.user).annotate(
+        num_links=Count("links")
+    )
+    if request.method == "POST":
+        try:
+            if request.POST.get("method") == "add":
+                category = [
+                    cat.pk
+                    for cat in categories
+                    if cat.name == request.POST.get("category")
+                ][0]
+                return addLink(request, category)
+            if request.POST.get("method") == "update":
+                category = [
+                    cat.pk
+                    for cat in categories
+                    if cat.name == request.POST.get("category")
+                ][0]
+                return updateLink(request, request.POST.get("id"), category)
+            if request.POST.get("method") == "delete":
+                return deleteLink(request, request.POST.get("id"))
+        except:
+            context = {"error": True}
+            return render(request, "links/cli.html", context)
+    context = {"fav_links": fav_links, "categories": categories}
+    return render(request, "links/cli.html", context)
