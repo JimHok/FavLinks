@@ -1,7 +1,6 @@
 from django.core.cache import cache
 import djclick as click
 from django.utils.html import strip_tags
-from django.db.models import Q
 from bs4 import BeautifulSoup
 import requests
 from rich.console import Console
@@ -56,7 +55,7 @@ def add_links_command(url, category, tags):
         return
 
     category = category if category != "None" else None
-    tags = list(tags.split(" ")) if tags != "None" else Q()
+    tags = list(tags.split(" ")) if tags != "None" else []
 
     post_data = {
         "url": url,

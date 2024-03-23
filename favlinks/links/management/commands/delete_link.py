@@ -27,7 +27,11 @@ def delete_link_command(id):
     if cache.get("cli_user") is None:
         console.print(Panel.fit("User not logged in yet!", style="red"))
         return
-    fav_link = FavLink.objects.get(id=id)
-    fav_link.delete()
+    try:
+        fav_link = FavLink.objects.get(id=id)
+        fav_link.delete()
+    except Exception as e:
+        console.print(Panel.fit(f"Error: {e}", style="red"))
+        return
 
     console.print(Panel.fit(f"Link deleted successfully!", style="green"))

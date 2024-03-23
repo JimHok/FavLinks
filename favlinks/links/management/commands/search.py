@@ -1,6 +1,7 @@
 from django.core.cache import cache
 import djclick as click
 from rich.console import Console
+from rich.table import Table
 from rich.panel import Panel
 from rich.traceback import install
 
@@ -18,22 +19,34 @@ def search_command(title):
         return
     user = cache.get("cli_user")
     fav_links = FavLink.objects.filter(user=user, title__contains=title).order_by(
-        "date"
+        "-date"
     )
+    table_link = Table(
+        title="Favorite Links Detail",
+        show_lines=True,
+        style="green",
+    )
+    table_link.add_column("ID")
+    table_link.add_column("Title")
+    table_link.add_column("URL")
+    table_link.add_column("Category")
+    table_link.add_column("Tags")
+    table_link.add_column("Status")
+    table_link.add_column("Date")
+
     for link in fav_links:
-        tags = [
-            tag.name for tag in link.tags.all()
-        ]  # Get the names of the related tags
+        tags = [tag.name for tag in link.tags.all()]
         tags_str = ", ".join(tags) if tags else "No tags"
-        panel = Panel.fit(
-            f"[bold]ID:[/bold] {link.pk}\n"
-            f"[bold]Title:[/bold] {link.title}\n"
-            f"[bold]URL:[/bold] {link.url}\n"
-            f"[bold]Category:[/bold] {link.category}\n"
-            f"[bold]Tags:[/bold] {tags_str}\n"
-            f"[bold]Status:[/bold] {link.status}\n"
-            f"[bold]Date:[/bold] {link.date}",
-            title="Link Details",
-            border_style="green",
+        status = "Online" if link.status else "Offline"
+        category_str = link.category.name if link.category else "No category"
+        table_link.add_row(
+            str(link.pk),
+            link.title,
+            link.url,
+            category_str,
+            tags_str,
+            status,
+            str(link.date),
         )
-        console.print(panel)
+
+    console.print(table_link)

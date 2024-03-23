@@ -27,7 +27,11 @@ def delete_tag_command(id):
     if cache.get("cli_user") is None:
         console.print(Panel.fit("User not logged in yet!", style="red"))
         return
-    tag = Tag.objects.get(id=id)
-    tag.delete()
+    try:
+        tag = Tag.objects.get(id=id)
+        tag.delete()
+    except Exception as e:
+        console.print(Panel.fit(f"Error: {e}", style="red"))
+        return
 
     console.print(Panel.fit(f"Link deleted successfully!", style="green"))

@@ -14,9 +14,10 @@ install()
 @click.option("--password", prompt="Password", help="Password", hide_input=True)
 def login_command(username, password):
     user = authenticate(username=username, password=password)
-    if user is not None:
+    if user != cache.get("cli_user") and cache.get("cli_user") is not None:
+        console.print(Panel.fit("User already logged in", style="red"))
+    elif user is not None:
         cache.set("cli_user", user, timeout=None)
         console.print(Panel.fit(f"Login successful user: {user}", style="green"))
-
     else:
-        console.print(Panel.fit("Invalid credentials", style="red"))
+        console.print(Panel.fit("Invalid username or password", style="red"))

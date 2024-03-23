@@ -27,7 +27,12 @@ def delete_cat_command(id):
     if cache.get("cli_user") is None:
         console.print(Panel.fit("User not logged in yet!", style="red"))
         return
-    cat = Category.objects.get(id=id)
-    cat.delete()
+
+    try:
+        cat = Category.objects.get(id=id)
+        cat.delete()
+    except Exception as e:
+        console.print(Panel.fit(f"Error: {e}", style="red"))
+        return
 
     console.print(Panel.fit(f"Link deleted successfully!", style="green"))
