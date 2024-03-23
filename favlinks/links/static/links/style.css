@@ -8,7 +8,7 @@ body {
   font: 0.875em/1.6 "Inconsolata", monospace;
   color: #181818;
   font-weight: 400;
-  max-width: 28em;
+  max-width: 40em;
   padding: 1em;
   margin: 5% 0;
 }
@@ -26,7 +26,7 @@ a {
 }
 a:hover,
 a:focus {
-  background: #181818;
+  background: #110505;
   color: #fff;
 }
 h2 {
@@ -59,7 +59,7 @@ kbd {
   padding: 0 0.2em;
 }
 input[type="text"] {
-  max-width: 10em;
+  width: 40em;
   border: none;
   font-family: inherit;
   background: #fff;
@@ -72,7 +72,7 @@ input[type="text"]:focus {
 }
 .command {
   display: block;
-  max-width: 20em;
+  width: 120em;
   color: #181818;
   font-weight: 700;
   margin: 2em 0;

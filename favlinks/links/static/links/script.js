@@ -82,7 +82,8 @@ function getCookie(name) {
 }
 
 var input = document.querySelector("input"),
-  block = document.getElementsByTagName("section");
+  block = document.getElementsByTagName("section"),
+  commandHistory = [];
 
 window.onload = function () {
   typeWriter("#home", "true", 1);
@@ -94,6 +95,7 @@ window.onload = function () {
   input.addEventListener("keyup", function (e) {
     if ((e.keyCode || e.which) == 13) {
       var inputValue = input.value.split(" ");
+      commandHistory.push(inputValue);
       var targetValue = inputValue[0];
       var destination = "#" + targetValue;
 

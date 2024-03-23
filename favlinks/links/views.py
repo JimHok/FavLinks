@@ -13,6 +13,10 @@ import requests
 import threading
 from bs4 import BeautifulSoup
 import json
+from rich.console import Console
+from rich.traceback import install
+
+install()
 
 from .models import *
 from .forms import CreateUserForm, FavoriteLinkForm, CategoryForm, TagForm
@@ -87,24 +91,48 @@ def handle_generic_link_form(request, pk=None, category=None):
     instance = None
     if pk:
         instance = FavLink.objects.get(id=pk)
+        # If the user is adding a new link, check if the background task
+        # for checking link validity is still running. If it is, redirect
+        # the user to the home page and display an error message.
         if not cache.get("links_updated"):
             messages.error(
                 request, "URLs validity checking in progress, please wait a moment..."
             )
             return redirect("/")
+
+    # Instantiate the form.
     form = FavoriteLinkForm(request.user, instance=instance)
+
+    # If the form is being submitted, check the URL and update the form
+    # with the title and status of the URL if it is valid.
     if request.method == "POST":
         try:
+            # Get the response from the URL and parse it with BeautifulSoup.
             response = requests.get(request.POST.get("url"))
             soup = BeautifulSoup(response.text, "html.parser")
-            title = soup.title.string
+
+            # Get the title of the page.
+            title = soup.title.string[:50]
+
+            # Make a mutable copy of the POST data so we can modify it.
             mutable_post = request.POST.copy()
+            print(mutable_post)
+
+            # If the title is blank or None, auto fill the title of the page from the URL request.
             if request.POST.get("title") == "" or request.POST.get("title") is None:
                 mutable_post["title"] = title
+
+            # Set the status of the link based on the HTTP status code.
             mutable_post["status"] = response.status_code == 200
+
+            # If a category was specified, add it to the form data.
             if category:
                 mutable_post["category"] = category
+
+            # Instantiate a new FavoriteLinkForm with the modified POST data.
             form = FavoriteLinkForm(request.user, mutable_post, instance=instance)
+
+            # If the form is valid, save the link and display a success message.
             if form.is_valid():
                 favorite_link = form.save(commit=False)
                 favorite_link.user = request.user
@@ -113,9 +141,15 @@ def handle_generic_link_form(request, pk=None, category=None):
                     request, f"Link {'updated' if pk else 'added'} successfully!"
                 )
                 return redirect("/")
-        except:
-            messages.error(request, "Invalid URL")
 
+        # If there was an error with the URL, display an error message.
+        except requests.exceptions.RequestException as e:
+            messages.error(request, f"Error: URL not valid.")
+
+        except Exception as e:
+            messages.error(request, f"Error: {e}")
+
+    # If the form is not being submitted or there was an error, render the form.
     context = {"form": form, "title": "Link Form"}
     return render(request, "links/link_form.html", context)
 
@@ -242,24 +276,28 @@ def commandLineInterface(request):
     )
     if request.method == "POST":
         try:
+            category = None
             if request.POST.get("method") == "add":
-                category = [
-                    cat.pk
-                    for cat in categories
-                    if cat.name == request.POST.get("category")
-                ][0]
+                if request.POST.get("category"):
+                    category = [
+                        cat.pk
+                        for cat in categories
+                        if cat.name == request.POST.get("category")
+                    ][0]
                 return addLink(request, category)
             if request.POST.get("method") == "update":
-                category = [
-                    cat.pk
-                    for cat in categories
-                    if cat.name == request.POST.get("category")
-                ][0]
+                if request.POST.get("category"):
+                    category = [
+                        cat.pk
+                        for cat in categories
+                        if cat.name == request.POST.get("category")
+                    ][0]
                 return updateLink(request, request.POST.get("id"), category)
             if request.POST.get("method") == "delete":
                 return deleteLink(request, request.POST.get("id"))
-        except:
+        except Exception as e:
+            print(e)
             context = {"error": True}
-            return render(request, "links/cli.html", context)
+            return HttpResponse("error")
     context = {"fav_links": fav_links, "categories": categories}
     return render(request, "links/cli.html", context)
