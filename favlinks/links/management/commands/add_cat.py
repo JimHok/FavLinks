@@ -1,5 +1,6 @@
 from django.core.cache import cache
 import djclick as click
+from django.utils.html import strip_tags
 from rich.console import Console
 from rich.panel import Panel
 from rich.traceback import install
@@ -37,4 +38,5 @@ def add_cat_command(category):
 
     else:
         for error in form.errors.values():
-            console.print(Panel.fit(f"[red]Error: {error}[/red]"))
+            cleaned_error = strip_tags(str(error))
+            console.print(Panel.fit(f"Error: {cleaned_error}", style="red"))

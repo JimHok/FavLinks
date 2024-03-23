@@ -1,5 +1,7 @@
 from django.core.cache import cache
 import djclick as click
+from django.utils.html import strip_tags
+from django.db.models import Q
 from bs4 import BeautifulSoup
 import requests
 from rich.console import Console
@@ -47,17 +49,20 @@ def add_links_command(url, category, tags):
         title = soup.title.string[:50]
         status = response.status_code == 200
     except requests.exceptions.RequestException as e:
-        console.print(Panel(f"[red]Error: {e}[/red]"))
+        console.print(Panel(f"Error: {e}", style="red"))
         return
     except Exception as e:
-        console.print(Panel(f"[red]An unexpected error occurred: {e}[/red]"))
+        console.print(Panel(f"An unexpected error occurred: {e}", style="red"))
         return
+
+    category = category if category != "None" else None
+    tags = list(tags.split(" ")) if tags != "None" else Q()
 
     post_data = {
         "url": url,
         "title": title,
         "category": category,
-        "tags": list(tags.split(" ")),
+        "tags": tags,
         "status": status,
     }
 
@@ -72,4 +77,5 @@ def add_links_command(url, category, tags):
 
     else:
         for error in form.errors.values():
-            console.print(Panel.fit(f"[red]Error: {error}[/red]"))
+            cleaned_error = strip_tags(str(error))
+            console.print(Panel.fit(f"Error: {cleaned_error}", style="red"))
