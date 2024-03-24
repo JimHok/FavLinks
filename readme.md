@@ -39,10 +39,6 @@ source .venv/Scripts/activate
 pip install -r requirements.txt
 ```
 
-### Important
-
-**_Celery and Celery Beat are needed to run peroidic task, to install please refer to the[ Celery documentation](https://docs.celeryq.dev/en/stable/django/first-steps-with-django.html#using-celery-with-django) and the[ Celery beat documentation](https://django-celery-beat.readthedocs.io/en/latest/)_**
-
 ## Database Setup
 
 ### 1. Navigage to folder
@@ -107,6 +103,10 @@ celery -A favlinks beat -l info --scheduler django_celery_beat.schedulers:Databa
 ### 4. Start peroidic task the first time
 
 - Access the website [http://127.0.0.1:8000/schedule](http://127.0.0.1:8000/schedule) to start the task
+
+### Important (If Celery cannot run on your machine)
+
+**_Celery and Celery Beat are needed to run peroidic task, to install please refer to the[ Celery documentation](https://docs.celeryq.dev/en/stable/django/first-steps-with-django.html#using-celery-with-django) and the[ Celery beat documentation](https://django-celery-beat.readthedocs.io/en/latest/)_**
 
 ## Run Application in Command Line Interface
 
