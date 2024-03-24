@@ -26,7 +26,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-- 3. For Windows
+- For Windows
 
 ```bash
 python -m venv .venv
