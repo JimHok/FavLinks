@@ -139,7 +139,7 @@ py manage.py register
 py manage.py login
 ```
 
-- If the system say you already loged in please use the following command to logout
+- If the system say you already logged in please use the following command to logout
 
 ```bash
 py manage.py logout
