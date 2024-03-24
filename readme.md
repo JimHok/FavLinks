@@ -29,7 +29,7 @@ source .venv/bin/activate
 - For Windows
 
 ```bash
-python -m venv .venv
+py -m venv .venv
 source .venv/Scripts/activate
 ```
 
