@@ -22,7 +22,7 @@ git clone https://github.com/JimHok/FavLinks.git
 - For Unix/macOS
 
 ```bash
-python3 -m venv .venv
+py -m venv .venv
 source .venv/bin/activate
 ```
 
