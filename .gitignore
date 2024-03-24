@@ -1,2 +1,4 @@
 .venv
 favlinks/db.sqlite3
+favlinks/htmlcov
+.coverage
