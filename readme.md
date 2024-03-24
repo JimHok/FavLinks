@@ -71,7 +71,7 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-You should now be able to access the development server at http://127.0.0.1:8000/.
+You should now be able to access the development server at [http://127.0.0.1:8000](http://127.0.0.1:8000/).
 
 ### 2. Run Celery for peroidic tasks (Peroidc check for link validity)
 
@@ -103,6 +103,10 @@ celery -A favlinks worker -l info -P gevent
 ```bash
 celery -A favlinks beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
 ```
+
+### 4. Start peroidic task the first time
+
+- Access the website [http://127.0.0.1:8000/schedule](http://127.0.0.1:8000/schedule) to start the task
 
 ## Run Application in Command Line Interface
 
