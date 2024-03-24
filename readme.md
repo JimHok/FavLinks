@@ -129,6 +129,22 @@ py manage.py
 
 ### 3. Use the command
 
+- Start with register your account and logging in
+
+```bash
+py manage.py register
+```
+
+```bash
+py manage.py login
+```
+
+- If the system say you already loged in please use the following command to logout
+
+```bash
+py manage.py logout
+```
+
 - To see how to use the command use --help after the command
 
 Example:
