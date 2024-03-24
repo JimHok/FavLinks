@@ -1,7 +1,7 @@
 {% extends 'links/form_main.html'%} {%load static%} {% block content %}
 <div class="form-container">
   <h2 class="text-center mb-4">{{title}}</h2>
-
+  <p class="text-center">Press CTRL and click the tags to select it</p>
   <form action="" method="POST">
     {% csrf_token %} {% for field in form %} {% if not field.is_hidden %}
     <div class="form-group">
