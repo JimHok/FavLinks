@@ -10,10 +10,7 @@ from django_celery_beat.models import IntervalSchedule, PeriodicTask
 from django.core.cache import cache
 
 import requests
-import threading
 from bs4 import BeautifulSoup
-import json
-from rich.console import Console
 from rich.traceback import install
 
 install()
@@ -116,7 +113,6 @@ def handle_generic_link_form(request, pk=None, category=None):
 
             # Make a mutable copy of the POST data so we can modify it.
             mutable_post = request.POST.copy()
-            print(mutable_post)
 
             # If the title is blank or None, auto fill the title of the page from the URL request.
             if request.POST.get("title") == "" or request.POST.get("title") is None:
@@ -255,7 +251,7 @@ def urlCheck(request):
 def scheduleTask(request):
 
     interval, _ = IntervalSchedule.objects.get_or_create(
-        every=10, period=IntervalSchedule.SECONDS
+        every=30, period=IntervalSchedule.SECONDS
     )
 
     PeriodicTask.objects.create(
@@ -269,7 +265,6 @@ def scheduleTask(request):
 
 @login_required(login_url="links:login")
 def commandLineInterface(request):
-    form = FavoriteLinkForm(request.user)
     fav_links = FavLink.objects.filter(user=request.user).order_by("-date")
     categories = Category.objects.filter(user=request.user).annotate(
         num_links=Count("links")
